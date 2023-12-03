@@ -4,8 +4,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 
 from course.models import Course, Lesson, Payments
-from course.permissions import IsOwnerOrIsSuperuserOrIsStaff, IsSuperuserOrIsOwner, NotStaff, \
-    IsStaffOrOwner
+from course.permissions import IsStaff, IsOwner, IsSuperuser
 from course.serializers import LessonSerializer, PaymentsSerializer, LessonListSerializer, \
     LessonDetailSerializer, CourseListSerializer
 
@@ -13,35 +12,35 @@ from course.serializers import LessonSerializer, PaymentsSerializer, LessonListS
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseListSerializer
     queryset = Course.objects.all()
-    permission_classes = [IsOwnerOrIsSuperuserOrIsStaff]
+    permission_classes = [IsStaff | IsOwner | IsSuperuser]
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
     serializer_class = LessonSerializer
-    permission_classes = [NotStaff]
+    permission_classes = [~IsStaff]
 
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonListSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsStaffOrOwner]
+    permission_classes = [IsStaff | IsOwner | IsSuperuser]
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
     serializer_class = LessonDetailSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsStaffOrOwner]
+    permission_classes = [IsStaff | IsOwner | IsSuperuser]
 
 
 class LessonUpdateAPIView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsStaffOrOwner]
+    permission_classes = [IsStaff | IsOwner | IsSuperuser]
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     queryset = Lesson.objects.all()
-    permission_classes = [IsSuperuserOrIsOwner]
+    permission_classes = [IsOwner | IsSuperuser]
 
 
 class PaymentsListAPIView(generics.ListAPIView):

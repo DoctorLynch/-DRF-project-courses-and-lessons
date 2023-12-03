@@ -1,33 +1,16 @@
 from rest_framework.permissions import BasePermission
 
 
-class IsOwnerOrIsSuperuserOrIsStaff(BasePermission):
+class IsSuperuser(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_superuser:
-            return True
-        elif request.user.is_staff and (view.action != 'destroy' or view.action != 'create'):
-            return True
-        return request.user == view.get_object().owner and (view.action == 'list' or view.action == 'update')
+        return request.user.is_superuser
 
 
-class IsStaffOrOwner(BasePermission):
+class IsStaff(BasePermission):
     def has_permission(self, request, view):
-        if request.user.is_staff:
-            return True
-
-        return request.user == view.get_object().owner
+        return request.user.is_staff and (view.action != 'destroy' or view.action != 'create')
 
 
-class IsSuperuserOrIsOwner(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.is_superuser:
-            return True
-        return request.user == view.get_object().owner
-
-
-class NotStaff(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.is_staff:
-            return False
-        else:
-            return True
+class IsOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.owner and (view.action == 'list' or view.action == 'update')
