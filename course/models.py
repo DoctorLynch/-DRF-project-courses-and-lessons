@@ -5,6 +5,7 @@ NULLABLE = {'blank': True, 'null': True}
 
 
 class Course(models.Model):
+    objects = None
     title = models.CharField(max_length=150, verbose_name='название')
     description = models.TextField(verbose_name='описание')
     image_preview = models.ImageField(upload_to='image_course', height_field=None, width_field=None, max_length=100,
@@ -20,6 +21,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
+    objects = None
     title = models.CharField(max_length=150, verbose_name='название')
     description = models.TextField(verbose_name='описание')
     image_preview = models.ImageField(upload_to='image_lesson', height_field=None, width_field=None, max_length=100,
@@ -56,3 +58,17 @@ class Payments(models.Model):
     class Meta:
         verbose_name = 'Платеж'
         verbose_name_plural = 'Платежи'
+
+
+class Subscription(models.Model):
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT, verbose_name='Пользователь',
+                             **NULLABLE)
+    course = models.ForeignKey(Course, verbose_name='Подписанный курс', on_delete=models.CASCADE, **NULLABLE)
+
+    def __str__(self):
+        return f'{self.course}'
+
+    class Meta:
+        verbose_name = 'подписка'
+        verbose_name_plural = 'подписки'

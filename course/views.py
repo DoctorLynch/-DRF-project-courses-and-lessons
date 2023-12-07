@@ -3,16 +3,18 @@ from rest_framework import viewsets, generics
 from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated
 
-from course.models import Course, Lesson, Payments
+from course.models import Course, Lesson, Payments, Subscription
+from course.paginators import ListPagination
 from course.permissions import IsStaff, IsOwner, IsSuperuser
 from course.serializers import LessonSerializer, PaymentsSerializer, LessonListSerializer, \
-    LessonDetailSerializer, CourseListSerializer
+    LessonDetailSerializer, CourseListSerializer, SubscriptionSerializer
 
 
 class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseListSerializer
-    queryset = Course.objects.all()
+    queryset = Course.objects.all().order_by('-id')
     permission_classes = [IsStaff | IsOwner | IsSuperuser]
+    pagination_class = ListPagination
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
@@ -22,8 +24,9 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
 class LessonListAPIView(generics.ListAPIView):
     serializer_class = LessonListSerializer
-    queryset = Lesson.objects.all()
+    queryset = Lesson.objects.all().order_by('-id')
     permission_classes = [IsStaff | IsOwner | IsSuperuser]
+    pagination_class = ListPagination
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
@@ -60,3 +63,24 @@ class PaymentsCreateAPIView(generics.CreateAPIView):
 class PaymentsDestroyAPIView(generics.DestroyAPIView):
     queryset = Payments.objects.all()
     permission_classes = [IsAuthenticated]
+
+
+class SubscriptionCreateAPIView(generics.CreateAPIView):
+    serializer_class = SubscriptionSerializer
+
+    def perform_create(self, serializer, **kwargs):
+        new_subscription = serializer.save()
+
+        new_subscription.user = self.request.user
+        new_subscription.course = Course.objects.get(id=self.kwargs['pk'])
+        new_subscription.save()
+
+
+class SubscriptionDestroyAPIView(generics.DestroyAPIView):
+
+    queryset = Subscription.objects.all()  # список уроков
+
+    def perform_destroy(self, instance, **kwargs):
+        user = self.request.user
+        subscription = Subscription.objects.get(course_id=self.kwargs['pk'], user=user)
+        subscription.delete()
