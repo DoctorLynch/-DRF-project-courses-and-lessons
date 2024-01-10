@@ -11,6 +11,7 @@ from course.serializers import LessonSerializer, PaymentsSerializer, LessonListS
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    """Viewset for course"""
     serializer_class = CourseListSerializer
     queryset = Course.objects.all().order_by('-id')
     permission_classes = [IsStaff | IsOwner | IsSuperuser]
@@ -18,6 +19,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 
 class LessonCreateAPIView(generics.CreateAPIView):
+    """Lesson create endpoint"""
     serializer_class = LessonSerializer
     permission_classes = [~IsStaff]
 
@@ -50,7 +52,7 @@ class PaymentsListAPIView(generics.ListAPIView):
     serializer_class = PaymentsSerializer
     queryset = Payments.objects.all()
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ('paid_lesson', 'paid_course', 'payment_method_choices')
+    filterset_fields = ('paid_lesson', 'paid_course', 'payment_method')
     ordering_fields = ('payment_date',)
     permission_classes = [IsAuthenticated]
 
@@ -66,6 +68,7 @@ class PaymentsDestroyAPIView(generics.DestroyAPIView):
 
 
 class SubscriptionCreateAPIView(generics.CreateAPIView):
+    queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
 
     def perform_create(self, serializer, **kwargs):

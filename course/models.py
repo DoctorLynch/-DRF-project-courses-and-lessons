@@ -30,7 +30,6 @@ class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='Курс', **NULLABLE)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, **NULLABLE)
 
-
     def __str__(self):
         return f'{self.title}'
 
@@ -61,7 +60,6 @@ class Payments(models.Model):
 
 
 class Subscription(models.Model):
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT, verbose_name='Пользователь',
                              **NULLABLE)
     course = models.ForeignKey(Course, verbose_name='Подписанный курс', on_delete=models.CASCADE, **NULLABLE)

@@ -10,7 +10,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     num_of_lesson = SerializerMethodField(read_only=True)
     lesson_this_course = SerializerMethodField(read_only=True)
     is_subscribed = serializers.SerializerMethodField(read_only=True)
-
+    payment_url = serializers.SerializerMethodField()
     def get_num_of_lesson(self, lesson):
         return Lesson.objects.filter(course=lesson).count()
 
@@ -23,7 +23,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ('title', 'num_of_lesson', 'lesson_this_course',)
+        fields = ('title', 'num_of_lesson', 'lesson_this_course', 'is_subscribed')
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
